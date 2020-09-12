@@ -15,8 +15,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -26,6 +24,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <inttypes.h>
+#include <time.h>
 
 #include "base64.h"
 #include "edsign.h"
@@ -208,18 +207,39 @@ static int verify(const char *msgfile)
 	return 0;
 }
 
+static void *read_file(const char *file, long *mlen)
+{
+	FILE *f = fopen(file, "rb");
+	void *buf;
+
+	if(f == NULL)
+		return NULL;
+
+	fseek(f, 0, SEEK_END);
+	*mlen = ftell(f);
+	rewind(f);
+
+	buf = malloc(*mlen);
+	if(buf == NULL)
+		goto out;
+
+	fread(buf, 1, *mlen, f);
+	fclose(f);
+
+out:
+	return buf;
+}
+
 static int sign(const char *msgfile)
 {
 	struct seckey skey;
 	struct sig sig = {
 		.pkalg = "Ed",
 	};
-	struct stat st;
 	char buf[512];
 	void *pubkey = buf;
 	long mlen;
 	void *m;
-	int mfd;
 
 	if (!get_base64_file(seckeyfile, &skey, sizeof(skey), buf, sizeof(buf)) ||
 	    memcmp(skey.pkalg, "Ed", 2) != 0) {
@@ -232,21 +252,16 @@ static int sign(const char *msgfile)
 		return 1;
 	}
 
-	mfd = open(msgfile, O_RDONLY, 0);
-	if (mfd < 0 || fstat(mfd, &st) < 0 ||
-		(m = mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, mfd, 0)) == MAP_FAILED) {
-		if (mfd >= 0)
-			close(mfd);
+	m = read_file(msgfile, &mlen);
+	if(m == NULL) {
 		perror("Cannot open message file");
 		return 1;
 	}
-	mlen = st.st_size;
 
 	memcpy(sig.fingerprint, skey.fingerprint, sizeof(sig.fingerprint));
 	edsign_sec_to_pub(pubkey, skey.seckey);
 	edsign_sign(sig.sig, pubkey, skey.seckey, m, mlen);
-	munmap(m, mlen);
-	close(mfd);
+	free(m);
 
 	if (b64_encode(&sig, sizeof(sig), buf, sizeof(buf)) < 0)
 		return 1;
@@ -292,23 +307,17 @@ static int generate(void)
 	};
 	struct sha512_state s;
 	char buf[512];
-	FILE *f;
 
-	f = fopen("/dev/urandom", "r");
-	if (!f) {
-		fprintf(stderr, "Can't open /dev/urandom\n");
-		return 1;
-	}
+	srand(time(NULL));
 
-	if (fread(skey.fingerprint, sizeof(skey.fingerprint), 1, f) != 1 ||
-	    fread(skey.seckey, EDSIGN_SECRET_KEY_SIZE, 1, f) != 1 ||
-	    fread(skey.salt, sizeof(skey.salt), 1, f) != 1) {
-		fprintf(stderr, "Can't read data from /dev/urandom\n");
-		fclose(f);
-		return 1;
-	}
-	if (f)
-		fclose(f);
+	for(unsigned i = 0; i < sizeof(skey.fingerprint); i++)
+		skey.fingerprint[i] = rand();
+
+	for(unsigned i = 0; i < EDSIGN_SECRET_KEY_SIZE; i++)
+		skey.seckey[i] = rand();
+
+	for(unsigned i = 0; i < sizeof(skey.salt); i++)
+		skey.salt[i] = rand();
 
 	ed25519_prepare(skey.seckey);
 	edsign_sec_to_pub(skey.seckey + 32, skey.seckey);
