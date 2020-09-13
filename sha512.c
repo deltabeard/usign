@@ -185,7 +185,7 @@ void sha512_init(struct sha512_state *s)
 	s->len = 0;
 }
 
-void sha512_add(struct sha512_state *s, const void *data, size_t len)
+void sha512_add(struct sha512_state *s, const uint8_t *data, size_t len)
 {
 	unsigned int partial = s->len & (SHA512_BLOCK_SIZE - 1);
 

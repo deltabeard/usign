@@ -10,7 +10,7 @@ const uint8_t f25519_one[F25519_SIZE] = {1};
 
 void f25519_load(uint8_t *x, uint32_t c)
 {
-	int i;
+	unsigned i;
 
 	for (i = 0; i < sizeof(c); i++) {
 		x[i] = c;

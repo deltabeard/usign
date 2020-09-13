@@ -59,6 +59,6 @@ edsign_verify_add(struct edsign_verify_state *st, const void *data, int len)
 }
 
 /* Verify a message signature. Returns non-zero if ok. */
-bool edsign_verify(struct edsign_verify_state *st, const void *sig, const void *pub);
+bool edsign_verify(struct edsign_verify_state *st, const uint8_t *sig, const void *pub);
 
 #endif

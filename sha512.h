@@ -46,7 +46,7 @@ struct sha512_state {
 /* Set up a new context */
 void sha512_init(struct sha512_state *s);
 
-void sha512_add(struct sha512_state *s, const void *data, size_t len);
+void sha512_add(struct sha512_state *s, const uint8_t *data, size_t len);
 
 /* Fetch a slice of the hash result. */
 #define SHA512_HASH_SIZE	64

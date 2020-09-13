@@ -1,9 +1,10 @@
-Makefile
 CMakeCache.txt
 CMakeFiles
 *.cmake
 *.a
 *.so
 *.dylib
+*.o
+*.obj
 install_manifest.txt
 usign

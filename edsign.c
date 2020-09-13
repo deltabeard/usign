@@ -131,7 +131,7 @@ void edsign_verify_init(struct edsign_verify_state *st, const void *sig,
 	sha512_add(&st->sha, pub, 32);
 }
 
-bool edsign_verify(struct edsign_verify_state *st, const void *sig, const void *pub)
+bool edsign_verify(struct edsign_verify_state *st, const uint8_t *sig, const void *pub)
 {
 	struct ed25519_pt p;
 	struct ed25519_pt q;
