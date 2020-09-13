@@ -19,16 +19,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
 #include <stdint.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <inttypes.h>
 #include <time.h>
 
 #include "base64.h"
 #include "edsign.h"
 #include "ed25519.h"
+#include "getopt.h"
 
 struct pubkey {
 	char pkalg[2];
@@ -418,7 +417,12 @@ int main(int argc, char **argv)
 	}
 
 	if (!sigfile && msgfile) {
-		char *buf = alloca(strlen(msgfile) + 5);
+		char buf[512];
+
+		if(strlen(msgfile) + 5 > 512) {
+			fprintf(stderr, "File name too long\n");
+			return 1;
+		}
 
 		if (!strcmp(msgfile, "-")) {
 			fprintf(stderr, "Need signature file when reading message from stdin\n");
