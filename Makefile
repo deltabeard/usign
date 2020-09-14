@@ -16,6 +16,11 @@ ifdef VSCMD_VER
 	RM := del
 	BLANK :=
 	SLASH := \$(BLANK)
+	ifeq ($(VSCMD_ARG_TGT_ARCH),x64)
+		CFLAGS += /Fdvc142.pdb
+	else
+		CFLAGS += /Fdvc141.pdb
+	endif
 endif
 
 SOURCES := ed25519.c edsign.c f25519.c fprime.c sha512.c base64.c main.c
