@@ -1,4 +1,19 @@
-Usign provides public key signatures using the ed25519 algorithm.
+# usign
+
+usign provides public key signatures using the ed25519 algorithm.
+
+## Build
+
+Unix-like and MSVC 2019 builds are supported. GNU Make is required. When
+building for Windows NT, execute GNU Make within the *Native Tools Command
+Prompt*, provided by Visual Studio.
+
+To build and install the package run:
+
+make
+make install
+
+## About
 
 The home page for the algorithm is http://ed25519.cr.yp.to/.
 It is described in the following paper:
@@ -11,11 +26,3 @@ http://ed25519.cr.yp.to/ed25519-20110926.pdf
 
 Signatures and keys are compatible to OpenBSD's signify utility:
 http://man.openbsd.org/OpenBSD-current/man1/signify.1
-
-To build and install the package run
-
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
