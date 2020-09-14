@@ -4,14 +4,18 @@ usign provides public key signatures using the ed25519 algorithm.
 
 ## Build
 
-Unix-like and MSVC 2019 builds are supported. GNU Make is required. When
-building for Windows NT, execute GNU Make within the *Native Tools Command
-Prompt*, provided by Visual Studio.
+Build requirements:
+* A C99 Compiler
+* GNU Make
+
+When building for Windows NT, execute GNU Make within the *Native Tools Command Prompt*, provided by Visual Studio.
 
 To build and install the package run:
 
+```
 make
 make install
+```
 
 ## About
 
